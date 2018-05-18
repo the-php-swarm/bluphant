@@ -1,4 +1,6 @@
 {
+    "name": "the-php-swarm/bliphant",
+    "version": "0.1",
     "require": {
         "textalk/websocket": "1.0.*"
     },
