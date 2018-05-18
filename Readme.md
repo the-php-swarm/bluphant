@@ -25,10 +25,6 @@ It might be interesting to build other 2 classes to work with this:
   $userMapper->insert($user);
   ```
 
-## Challenges
-
-Since Bluzelle is a **key-value** database, the application, to start using this solution, might change a little bit its processes to fit.
-
 ---
 
 # How to
