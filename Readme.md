@@ -1,5 +1,7 @@
 # Bluphant
 
+[![Build Status](https://travis-ci.org/the-php-swarm/bluphant.svg?branch=master)](https://travis-ci.org/the-php-swarm/bluphant)
+
 Bluphant is a PHP library to interact with Bluzelle Blockchain Database.
 
 Bluzelle is a Blockchain Database that works in a system of swarms, this makes the availability, integrity, integrability and the consistency be natural. This is a PHP Database Adapter for Bluzelle.
