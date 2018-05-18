@@ -11,6 +11,6 @@
         "phpunit/phpunit": "^7"
     },
     "scripts": {
-        "pre-autoload-dump": "vendor/bin/phpunit tests"
+        "pre-autoload-dump": "php vendor/bin/phpunit tests"
     }
 }
