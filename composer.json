@@ -1,5 +1,5 @@
 {
-    "name": "the-php-swarm/bliphant",
+    "name": "the-php-swarm/bluphant",
     "description": "A PHP library to interact with Bluzelle Blockchain Database",
     "version": "0.1",
     "require": {
