@@ -3,11 +3,6 @@
 /**
  * Bluzelle Database Adapter Unit Tests
  *
- * Before Testing, it must have:
- *
- *     - Swarm JS Client (https://github.com/bluzelle/swarmclient-js),
- *       running with the command "node Emulator"
- *
  * @package    Bluphant
  * @author     Savio Resende <savio@savioresende.com.br>
  * @copyright  2018 Savio Resende
@@ -23,7 +18,7 @@ use Bluphant\BluphantAdapter;
 final class BluphantAdapterTest extends TestCase
 {
     /* @var */
-    protected $adapter;
+    protected $bluphantAdapterMock;
 
     /* @var */
     protected $table;
@@ -36,10 +31,9 @@ final class BluphantAdapterTest extends TestCase
      */
     public function setUpConnetion()
     {
-        $this->adapter = new BluphantAdapter(
-            '127.0.0.1',
-            8100
-        );
+        $this->bluphantAdapterMock = $this->getMockBuilder('Bluphant\BluphantAdapter')
+            ->setConstructorArgs(['127.0.0.1', 8100])
+            ->getMock();
 
         $this->table = '3f966cd1-ef79-4464-b3be-81e84002550b';
     }
@@ -49,12 +43,18 @@ final class BluphantAdapterTest extends TestCase
      */
     public function testRegisterCreation(): void
     {
-        $this->adapter->insert($this->table, [
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('insert')
+            ->will($this->returnValue($this->bluphantAdapterMock));
+
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue('{"request-id": 4}'));
+
+        $result = $this->bluphantAdapterMock->insert($this->table, [
             "key" => "key1",
             "value" => "sample value"
-        ]);
-
-        $result = $this->adapter->execute();
+        ])->execute();
 
         $this->assertTrue(json_decode($result) !== null);
         $this->assertArrayHasKey('request-id', json_decode($result, true));
@@ -66,11 +66,17 @@ final class BluphantAdapterTest extends TestCase
      */
     public function testRegisterRetrieval(): void
     {
-        $this->adapter->select($this->table, [
-            "key" => "key1"
-        ]);
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('select')
+            ->will($this->returnValue($this->bluphantAdapterMock));
 
-        $result = $this->adapter->execute();
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue('{"data" : {"key":"key1"},"request-id" : 4}'));
+
+        $result = $this->bluphantAdapterMock->select($this->table, [
+            "key" => "key1"
+        ])->execute();
 
         $this->assertTrue(json_decode($result) !== null);
         $this->assertArrayHasKey('request-id', json_decode($result, true));
@@ -82,12 +88,18 @@ final class BluphantAdapterTest extends TestCase
      */
     public function testRegisterUpdate(): void
     {
-        $this->adapter->update($this->table, [
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('update')
+            ->will($this->returnValue($this->bluphantAdapterMock));
+
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue('{"request-id": 4}'));
+
+        $result = $this->bluphantAdapterMock->update($this->table, [
             "key" => "key1",
             "value" => "sample value 2"
-        ]);
-
-        $result = $this->adapter->execute();
+        ])->execute();
 
         $this->assertTrue(json_decode($result) !== null);
         $this->assertArrayHasKey('request-id', json_decode($result, true));
@@ -99,11 +111,17 @@ final class BluphantAdapterTest extends TestCase
      */
     public function testRegisterDelete(): void
     {
-        $this->adapter->delete($this->table, [
-            "key" => "key1"
-        ]);
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('delete')
+            ->will($this->returnValue($this->bluphantAdapterMock));
 
-        $result = $this->adapter->execute();
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue('{"request-id": 4}'));
+
+        $result = $this->bluphantAdapterMock->delete($this->table, [
+            "key" => "key1"
+        ])->execute();
 
         $this->assertTrue(json_decode($result) !== null);
         $this->assertArrayHasKey('request-id', json_decode($result, true));
@@ -115,9 +133,17 @@ final class BluphantAdapterTest extends TestCase
      */
     public function testRegistersKeys(): void
     {
-        $this->adapter->keys($this->table);
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('keys')
+            ->will($this->returnValue($this->bluphantAdapterMock));
 
-        $result = $this->adapter->execute();
+        $this->bluphantAdapterMock->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue(
+                '{"data": {"keys": ["key1", "key2"]},"request-id": 4}'
+            ));
+
+        $result = $this->bluphantAdapterMock->keys($this->table)->execute();
 
         $this->assertTrue(json_decode($result) !== null);
         $this->assertArrayHasKey('request-id', json_decode($result, true));
