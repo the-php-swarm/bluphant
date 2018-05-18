@@ -4,3 +4,5 @@ php:
   - '7.2'
 
 install: composer install
+
+script: php ./vendor/bin/phpunit ./tests
