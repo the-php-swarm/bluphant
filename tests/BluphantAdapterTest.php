@@ -149,4 +149,24 @@ final class BluphantAdapterTest extends TestCase
         $this->assertArrayHasKey('request-id', json_decode($result, true));
         $this->assertFalse(isset(json_decode($result, true)['error']));
     }
+
+    /**
+     * 
+     */
+    public function testRegistersFetch(): void
+    {
+        $this->expectException(Bluphant\Exceptions\NotImplementedException::class);
+
+        (new BluphantAdapter('127.0.0.1', 8100))->fetch($this->table);
+    }
+
+    /**
+     *
+     */
+    public function testRegistersFetchAll(): void
+    {
+        $this->expectException(Bluphant\Exceptions\NotImplementedException::class);
+
+        (new BluphantAdapter('127.0.0.1', 8100))->fetchAll($this->table);
+    }
 }

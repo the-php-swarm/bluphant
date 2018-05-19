@@ -18,6 +18,7 @@
 namespace Bluphant;
 
 use Bluphant\Interfaces\DatabaseAdapterInterface;
+use Bluphant\Exceptions\NotImplementedException;
 use WebSocket\Client;
 
 class BluphantAdapter implements DatabaseAdapterInterface
@@ -48,10 +49,27 @@ class BluphantAdapter implements DatabaseAdapterInterface
     protected $client;
 
     /**
-     * TODO
+     * @param string $table
+     * @param string $fetchStyle
+     * @param string $cursorOrientation
+     * @param string $cursorOffset
+     * @return string|void
      */
-    // public function fetch($fetchStyle = null, $cursorOrientation = null, $cursorOffset = null) { }
-    // public function fetchAll($fetchStyle = null, $column = 0) {}
+    public function fetch(string $table, $fetchStyle = null, $cursorOrientation = null, $cursorOffset = null)
+    {
+        throw new NotImplementedException('Bluzelle does not support fetching all records at this time');
+    }
+
+    /**
+     * @param string $table
+     * @param string $fetchStyle
+     * @param int $column
+     * @return string|void
+     */
+    public function fetchAll(string $table, $fetchStyle = null, $column = 0)
+    {
+        throw new NotImplementedException('Bluzelle does not support fetching all records at this time');
+    }
 
     /**
      * Specify the database credentials for connection
