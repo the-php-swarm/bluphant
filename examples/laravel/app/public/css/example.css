@@ -1,19 +1,45 @@
 
+/* generic */
+
+.cleaner {
+    clear: both;
+}
+
+/* notes layout */
+
 .container {
     margin: 0 auto;
+    width: 100%;
     max-width: 1200px;
 }
 .container h1 {
     margin: 0 auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
 }
+
+/* menu */
 
 .container .menu-container {
     width: 100%;
 }
 
+.container .menu-container ul{ 
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.container .menu-container ul li{ 
+    float: left;
+    margin-left: 15px;
+}
+
+.container .menu-container ul li:first-child{ 
+    float: left;
+    margin-left: 0px;
+}
+
 a {
+    color: #000;
 	text-decoration: none;
 }
 
@@ -29,4 +55,97 @@ a.active {
 div.inline-option,
 div.inline-option form {
     display: inline;
+}
+
+/* container top */
+
+.content-top-item {
+    height: 50px;
+    line-height: 50px;
+    box-sizing: border-box;
+}
+
+.content-top-item i { 
+    font-size: 20px;
+}
+
+.content-top-left {
+    float: left;
+    padding-right: 25px;
+    width: 30%;
+    text-align: left;
+}
+
+.content-top-center {
+    float: left;
+    width: 40%;
+    text-align: center;
+    word-wrap: break-word;
+    height: auto;
+    border-bottom: 1px solid #000;
+}
+
+.content-top-right {
+    float: left;
+    padding-left: 25px;
+    width: 30%;
+    text-align: right;
+}
+
+/* notes list */
+
+ul.notes-list {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+}
+
+ul.notes-list li {
+    background-color: #ccc;
+    box-sizing: border-box;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    border-bottom: 1px solid #000;
+}
+
+ul.notes-list li .options {
+    float: right;
+    padding-right: 15px;
+}
+
+/* form */
+
+form .input-row {
+    width: 100%;
+    padding-bottom: 15px;
+}
+
+form .input-row label {
+    font-size: 20px;
+    padding-bottom: 10px;
+}
+
+form .input-row input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 15px;
+    font-size: 16px;
+}
+
+form .input-row textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 15px;
+    font-size: 16px;
+}
+
+form .input-row input[type="submit"] {
+    padding: 10px 15px;
+    border: 1px solid #000;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
 }

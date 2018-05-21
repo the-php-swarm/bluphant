@@ -7,4 +7,6 @@
         <li><a href="/notes" class="{{ ( $active == "notes" )? "active" : "" }}">Notes</a></li>
         <li><a class="disabled">Contact</a></li>
     </ul>
+
+    <div class="cleaner"></div>
 </div>

@@ -18,6 +18,8 @@
                 'sub_title' => ''
             ])
 
+            <hr/>
+
             <div id="content-container">
                 <p>Bluphant PHP Adapter example.</p>
             </div>
