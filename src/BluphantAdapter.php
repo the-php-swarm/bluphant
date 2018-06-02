@@ -20,6 +20,8 @@ namespace Bluphant;
 use Bluphant\Interfaces\DatabaseAdapterInterface;
 use Bluphant\Exceptions\NotImplementedException;
 use WebSocket\Client;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 class BluphantAdapter implements DatabaseAdapterInterface
 {
@@ -31,21 +33,25 @@ class BluphantAdapter implements DatabaseAdapterInterface
      *     'methods': enum
      * ]
      *
-     * @var
+     * @var array
      */
     protected $config;
 
     /**
      * @internal [ "key" => string, "value" => string ]
      *
-     * @var
+     * @var array
      */
     protected $statement;
 
-    /* @var */
-    protected $request_id;
+    /**
+     * @var int
+     */
+    protected $request_id = 0;
 
-    /* @var */
+    /**
+     * @var Client
+     */
     protected $client;
 
     /**
@@ -90,14 +96,19 @@ class BluphantAdapter implements DatabaseAdapterInterface
         $this->config = compact('address', 'port');
 
         $this->client = new Client("ws://" . $this->config['address'] . ":" . $this->config['port']);
+
+        $this->log_info = new Logger('BluphantAdapterInfo');
+        $this->log_info->pushHandler(new StreamHandler('./bluphant-adapter.log', Logger::INFO));
     }
 
     /**
      * Executes the request against the network
      *
+     * @param int $attempts
+     *
      * @return string json
      */
-    public function execute()
+    public function execute($attempts = 0)
     {
         $execution_params = [
             "bzn-api" => "crud",
@@ -107,9 +118,36 @@ class BluphantAdapter implements DatabaseAdapterInterface
             "request-id" => $this->request_id
         ];
 
+        $this->log_info->info('Request statement: ', $execution_params);
+
         $this->client->send(json_encode($execution_params));
 
-        return $this->client->receive();
+        $result = $this->client->receive();
+
+        $this->log_info->info('Request result: ', [$result]);
+
+        if($attempts > 0){
+            throw new \Exception('Multiple attempts happening. This is being investigated.');
+        }
+
+        if ($this->isLeaderResponse($result) && $attempts < 2) {
+            $attempts++;
+            return $this->execute($attempts);
+        }
+
+        $result = json_decode($result, true);
+
+        // place the statement in the result preffering the result's data
+        switch ($this->config['method']) {
+            case self::READ:
+                $result = array_merge($this->statement, $result['data']);
+                break;
+            case self::KEYS:
+                $result = $result['data'];
+                break;
+        }
+
+        return $result;
     }
 
     /**
@@ -117,9 +155,10 @@ class BluphantAdapter implements DatabaseAdapterInterface
      *
      * @return BluphantAdapter
      */
-    public function keys($table){
+    public function keys($table)
+    {
         $this->config['db_uuid'] = $table;
-        $this->config['method'] = 'keys';
+        $this->config['method'] = self::KEYS;
 
         return $this;
     }
@@ -131,9 +170,10 @@ class BluphantAdapter implements DatabaseAdapterInterface
      *
      * @return BluphantAdapter
      */
-    public function select($table, array $bind, $boolOperator = "AND") {
+    public function select($table, array $bind, $boolOperator = "AND")
+    {
         $this->config['db_uuid'] = $table;
-        $this->config['method'] = 'read';
+        $this->config['method'] = self::READ;
         $this->statement = $bind;
 
         return $this;
@@ -148,7 +188,7 @@ class BluphantAdapter implements DatabaseAdapterInterface
     public function insert($table, array $bind)
     {
         $this->config['db_uuid'] = $table;
-        $this->config['method'] = 'create';
+        $this->config['method'] = self::CREATE;
         $this->statement = $bind;
 
         return $this;
@@ -161,9 +201,10 @@ class BluphantAdapter implements DatabaseAdapterInterface
      *
      * @return BluphantAdapter
      */
-    public function update($table, array $bind, $where = "") {
+    public function update($table, array $bind, $where = "")
+    {
         $this->config['db_uuid'] = $table;
-        $this->config['method'] = 'update';
+        $this->config['method'] = self::UPDATE;
         $this->statement = $bind;
 
         return $this;
@@ -175,12 +216,34 @@ class BluphantAdapter implements DatabaseAdapterInterface
      *
      * @return BluphantAdapter
      */
-    public function delete($table, $bind) {
+    public function delete($table, $bind)
+    {
         $this->config['db_uuid'] = $table;
-        $this->config['method'] = 'delete';
+        $this->config['method'] = self::DELETE;
         $this->statement = $bind;
 
         return $this;
+    }
+
+    /**
+     * Verify if the result is pointing to a new leader
+     *
+     * @param string $result
+     *
+     * @return bool
+     */
+    private function isLeaderResponse(string $result)
+    {
+        $result = json_decode($result, true);
+
+        if (isset($result['data']['leader-host'])) {
+            $this->client = new Client(
+                "ws://" . $result['data']['leader-host'] . ":" . $result['data']['leader-port']
+            );
+            return true;
+        }
+
+        return false;
     }
 
 }
