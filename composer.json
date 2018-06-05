@@ -4,7 +4,8 @@
     "version": "0.1",
     "license": "MIT",
     "require": {
-        "textalk/websocket": "1.0.*"
+        "textalk/websocket": "1.0.*",
+        "monolog/monolog": "^1.23"
     },
     "autoload": {
         "psr-4": {
