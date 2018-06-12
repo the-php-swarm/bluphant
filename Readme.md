@@ -34,17 +34,7 @@ It might be interesting to build other 2 classes to work with this:
 ### Using Composer
 
 ```json
-{
-  "repositories": [
-    {
-      "url": "https://github.com/the-php-swarm/bluphant.git",
-      "type": "vcs"
-    }
-  ],
-  "require": {
-    "the-php-swarm/bliphant": "beta"
-  }
-}
+composer require the-php-swarm/bliphant
 ```
 
 ## Prepare Adapter
