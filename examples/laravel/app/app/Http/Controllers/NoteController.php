@@ -184,7 +184,7 @@ class NoteController extends Controller
 
         $result = $this->adapter->update($this->table, $note)->execute();
 
-        if( isset(json_decode($result, true)['request-id']) ) {
+        if( isset($result['request-id']) ) {
             return redirect('notes/' . $key);
         }
 
