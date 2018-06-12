@@ -55,6 +55,31 @@ class BluphantAdapter implements DatabaseAdapterInterface
     protected $client;
 
     /**
+     * @var string
+     */
+    const KEYS = 'keys';
+
+    /**
+     * @var string
+     */
+    const READ = 'read';
+
+    /**
+     * @var string
+     */
+    const CREATE = 'create';
+
+    /**
+     * @var string
+     */
+    const UPDATE = 'update';
+
+    /**
+     * @var string
+     */
+    const DELETE = 'delete';
+
+    /**
      * @param string $table
      * @param string $fetchStyle
      * @param string $cursorOrientation
@@ -136,6 +161,10 @@ class BluphantAdapter implements DatabaseAdapterInterface
         }
 
         $result = json_decode($result, true);
+
+        if (!isset($result['data']) || $result['data'] === null) {
+            $result['data'] = [];
+        }
 
         // place the statement in the result preffering the result's data
         switch ($this->config['method']) {
