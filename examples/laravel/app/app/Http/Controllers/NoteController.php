@@ -7,6 +7,7 @@ use Bluphant\BluphantAdapter;
 use Bluphant\Interfaces\DatabaseAdapterInterface;
 use App\Model\Mapper\NoteMapper;
 
+// TODO: simplify this controler through implementation of a mapper layer
 class NoteController extends Controller
 {
     /**
@@ -44,17 +45,13 @@ class NoteController extends Controller
      */
     public function index(Request $request)
     {
-        $notes = json_decode(
-            $this->adapter->keys($this->table)->execute(),
-            true
-        );
+        $notes = $this->adapter->keys($this->table)->execute();
 
         $notes_array = [];
-        foreach ($notes['data']['keys'] as $key => $value) {
-            $notes_array[$key] = json_decode(
-                $this->adapter->select($this->table, ['key' => $value])->execute(),
-                true
-            )['data'];
+        if (isset($notes['keys'])) {
+            foreach ($notes['keys'] as $key => $value) {
+                $notes_array[$key] = $this->adapter->select($this->table, ['key' => $value])->execute();
+            }
         }
 
         $notes_array = array_map(function($item){
@@ -78,10 +75,11 @@ class NoteController extends Controller
      */
     public function create()
     {
-        $next_note_key = json_decode(
-            $this->adapter->keys($this->table)->execute(),
-            true
-        )['data']['keys'];
+        $next_note_key = $this->adapter->keys($this->table)->execute();
+
+        if (isset($next_note_key['keys'])) {
+            $next_note_key = $next_note_key['keys'];
+        }
 
         if (empty($next_note_key)) {
             $next_note_key = 1;
@@ -103,16 +101,16 @@ class NoteController extends Controller
     public function store(Request $request)
     {
         $new_note = [
-            'key' => $request->input('key'), 
+            'key' => $request->input('key'),
             'value' => json_encode([
-                'title' => $request->input('title'), 
+                'title' => $request->input('title'),
                 'content' => $request->input('content')
-            ]) 
+            ])
         ];
 
         $result = $this->adapter->insert($this->table, $new_note)->execute();
 
-        if( isset(json_decode($result, true)['request-id']) ) {
+        if( isset($result['request-id']) ) {
             return redirect('notes/' . $request->input('key'));
         }
 
@@ -127,10 +125,7 @@ class NoteController extends Controller
      */
     public function show($key)
     {
-        $note = json_decode(
-            $this->adapter->select($this->table, ['key' => $key])->execute(),
-            true
-        )['data'];
+        $note = $this->adapter->select($this->table, ['key' => $key])->execute();
 
         $note_value = json_decode($note['value'], true);
 
@@ -153,10 +148,7 @@ class NoteController extends Controller
      */
     public function edit($key)
     {
-        $note = json_decode(
-            $this->adapter->select($this->table, ['key' => $key])->execute(),
-            true
-        )['data'];
+        $note = $this->adapter->select($this->table, ['key' => $key])->execute();
 
         $note_value = json_decode($note['value'], true);
 
@@ -207,6 +199,7 @@ class NoteController extends Controller
      */
     public function destroy($key)
     {
+        // TODO: improve this result messaging
         $result = $this->adapter->delete($this->table, ['key' => $key])->execute();
 
         return redirect('notes');
