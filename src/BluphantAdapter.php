@@ -135,17 +135,52 @@ class BluphantAdapter implements DatabaseAdapterInterface
      */
     public function execute($attempts = 0)
     {
-        $execution_params = [
-            "bzn-api" => "crud",
-            "cmd" => $this->config['method'],
-            "data" => $this->statement,
-            "db-uuid" => $this->config['db_uuid'],
-            "request-id" => $this->request_id
+//         $executionParams = [
+//             "bzn-api" => "crud",
+//             "cmd" => $this->config['method'],
+//             "data" => $this->statement,
+//             "db-uuid" => $this->config['db_uuid'],
+//             "request-id" => $this->request_id
+//         ];
+
+        // --
+        $protobufDatabaseMsg = new \database_msg();
+
+        // prepare header
+        $protobufHeaderMsg = new \database_header();
+        $protobufHeaderMsg->setDbUuid($this->config['db_uuid']);
+        $protobufHeaderMsg->setTransactionId($this->request_id);
+        $protobufDatabaseMsg->setHeader($protobufHeaderMsg);
+
+        switch ($this->config['method']) {
+            case self::READ:
+                // prepare read message
+                $protobufReadMsg = new \database_read();
+                $protobufReadMsg->setKey($this->statement['key']);
+                $protobufDatabaseMsg->setRead($protobufReadMsg);
+                break;
+            case self::KEYS:
+                // prepare keys message
+                $protobufKeysMsg = new \database_empty();
+                $protobufDatabaseMsg->setKeys($protobufKeysMsg);
+                break;
+        }
+//        dd($protobufDatabaseMsg);
+
+        $data = base64_encode($protobufDatabaseMsg->serializeToString());
+
+        $executionParams = [
+            "bzn-api" => "database",
+            "msg" => $data
         ];
 
-        $this->log_info->info('Request statement: ', $execution_params);
+//        dd($executionParams);
+        // --
 
-        $this->client->send(json_encode($execution_params));
+//        $this->log_info->info('Request statement: ', $executionParams);
+        $this->log_info->info('Request statement: ', [$data]);
+
+        $this->client->send(json_encode($executionParams));
 
         $result = $this->client->receive();
 
