@@ -135,14 +135,6 @@ class BluphantAdapter implements DatabaseAdapterInterface
      */
     public function execute($attempts = 0)
     {
-//         $executionParams = [
-//             "bzn-api" => "crud",
-//             "cmd" => $this->config['method'],
-//             "data" => $this->statement,
-//             "db-uuid" => $this->config['db_uuid'],
-//             "request-id" => $this->request_id
-//         ];
-
         // --
         $protobufDatabaseMsg = new \database_msg();
 
@@ -152,20 +144,29 @@ class BluphantAdapter implements DatabaseAdapterInterface
         $protobufHeaderMsg->setTransactionId($this->request_id);
         $protobufDatabaseMsg->setHeader($protobufHeaderMsg);
 
+//        $this->config['method'] = 'read';
         switch ($this->config['method']) {
             case self::READ:
                 // prepare read message
                 $protobufReadMsg = new \database_read();
-                $protobufReadMsg->setKey($this->statement['key']);
+//                $protobufReadMsg->setKey($this->statement['key']);
+                $protobufReadMsg->setKey("1");
                 $protobufDatabaseMsg->setRead($protobufReadMsg);
+//                dd($protobufDatabaseMsg);
                 break;
             case self::KEYS:
                 // prepare keys message
                 $protobufKeysMsg = new \database_empty();
                 $protobufDatabaseMsg->setKeys($protobufKeysMsg);
                 break;
+            case self::CREATE:
+                // prepare create message
+                $protobufCreateMsg = new \database_create();
+                $protobufCreateMsg->setKey($this->statement['key']);
+                $protobufCreateMsg->setValue($this->statement['value']);
+                $protobufDatabaseMsg->setCreate($protobufCreateMsg);
+                break;
         }
-//        dd($protobufDatabaseMsg);
 
         $data = base64_encode($protobufDatabaseMsg->serializeToString());
 
@@ -174,30 +175,34 @@ class BluphantAdapter implements DatabaseAdapterInterface
             "msg" => $data
         ];
 
-//        dd($executionParams);
         // --
 
-//        $this->log_info->info('Request statement: ', $executionParams);
-        $this->log_info->info('Request statement: ', [$data]);
+        $this->log_info->info('Request statement (execution params): ', [$executionParams]);
+        $this->log_info->info('Request statement (data): ', [$data]);
 
         $this->client->send(json_encode($executionParams));
 
         $result = $this->client->receive();
+        $protobufResponse = new \database_response($result);
 
-        $this->log_info->info('Request result: ', [$result]);
+        $success = $protobufResponse->getSuccess();
+//        dd($success);
+
+        $this->log_info->info('Request result (success): ', [$success]);
 
         if($attempts > 0){
             throw new \Exception('Multiple attempts happening. This is being investigated.');
         }
 
-        if ($this->isLeaderResponse($result) && $attempts < 2) {
-            $attempts++;
-            return $this->execute($attempts);
-        }
+        // TODO: this is to deal with the redirection response
+//        if ($this->isLeaderResponse($result) && $attempts < 2) {
+//            $attempts++;
+//            return $this->execute($attempts);
+//        }
 
         $result = json_decode($result, true);
 
-        if (!isset($result['data']) || $result['data'] === null) {
+        if (empty($success)) {
             $result['data'] = [];
         }
 
