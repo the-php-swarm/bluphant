@@ -3,6 +3,18 @@ language: php
 php:
   - '7.2'
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - sourceline: 'deb http://ppa.launchpad.net/maarten-fonville/protobuf/ubuntu trusty main'
+    packages:
+      - protobuf-compiler
+
+before_install:
+  - mkdir src/protobuf
+  - protoc --php_out=src/protobuf --proto_path=proto/proto bluzelle.proto database.proto audit.proto
+
 install: composer install
 
 script: php ./vendor/bin/phpunit ./tests
