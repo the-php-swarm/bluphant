@@ -31,6 +31,47 @@ BLUZELLE_PORT=8100
 
 ### Step 4
 
+Confirm the configuration at your composer.json, more specifically, the autoload attribute, it should look something close to this:
+
+```json
+"autoload": {
+    ...
+    "files": [
+        "database_create.php",
+        "database_delete.php",
+        "database_empty.php",
+        "database_has.php",
+        "database_header.php",
+        "database_msg.php",
+        "database_read.php",
+        "database_redirect_response.php",
+        "database_response.php",
+        "database_response_response.php",
+        "database_update.php"
+    ],
+    "psr-4": {
+        ...
+        "GPBMetadata\\": "GPBMetadata/"
+    }
+},
+```
+
+---
+
+## Swoole Server
+
+Install packages:
+
+```shell
+composer require hhxsv5/laravel-s
+```
+
+or
+
+```shell
+composer require swooletw/laravel-swoole
+```
+
 Once Swoole is installed, run:
 
 ```
