@@ -178,6 +178,7 @@ class BluphantAdapter implements DatabaseAdapterInterface
             case self::DELETE:
                 $protobufDeleteMsg = new \database_delete();
                 $protobufDeleteMsg->setKey($this->statement['key']);
+                $protobufDatabaseMsg->setDelete($protobufDeleteMsg);
                 break;
         }
 
