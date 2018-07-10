@@ -37,6 +37,12 @@ It might be interesting to build other 2 classes to work with this:
 composer require the-php-swarm/bliphant
 ```
 
+Because of the necessary support to **[protobuf](https://developers.google.com/protocol-buffers/)**, a required step to use this library is to install a PECL package through this command:
+
+```shell
+sudo pecl install protobuf-3.5.1
+```
+
 ## Prepare Adapter
 
 ```php
@@ -101,3 +107,15 @@ echo $adapter->execute();
 
 - [Bluzelle WebSocket API](https://bluzelle.github.io/api/#websocket-api)
 
+
+---
+
+## Protobuf
+
+There is a build step of this library for protobuf. This will be required so it accomplished the goal of Bluzelle project, which is to have a better environment for development and business.
+
+During the build step, that is not required for someone that is simply using this library, is to run this at the root directory of this library:
+
+```shell 
+protoc --proto_path=src/Datastructure --php_out=./src/Datastructure Database.proto
+```

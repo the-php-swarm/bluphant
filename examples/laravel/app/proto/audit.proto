@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+message audit_message {
+    oneof msg {
+        commit_notification commit = 1;
+        leader_status leader_status = 2;
+    }
+}
+
+message leader_status {
+    uint64 term = 1;
+    string leader = 2;
+    uint64 current_log_index = 3;
+    uint64 current_commit_index = 4;
+}
+
+message commit_notification {
+    string sender_uuid = 1;
+    uint64 log_index = 2;
+    string operation = 3;
+}
