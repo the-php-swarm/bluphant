@@ -11,8 +11,12 @@
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^5.4.0",
+<<<<<<< Updated upstream
         "swooletw/laravel-swoole": "^2.3",
         "the-php-swarm/bluphant": "dev-master"
+=======
+        "bluzelle/bluzelle-php": "dev-master"
+>>>>>>> Stashed changes
     },
     "require-dev": {
         "filp/whoops": "^2.0",
