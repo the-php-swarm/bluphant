@@ -1,8 +1,8 @@
 {
-    "name": "the-php-swarm/bluphant",
+    "name": "bluzelle/bluzelle-php",
     "description": "A PHP library to interact with Bluzelle Blockchain Database",
     "version": "0.1",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "require": {
         "textalk/websocket": "1.0.*",
         "monolog/monolog": "^1.23"

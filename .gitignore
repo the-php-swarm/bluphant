@@ -4,3 +4,5 @@ composer.lock
 examples/laravel/.gitmodule
 examples/laravel/app/.env
 examples/laravel/app/public/bluphant-adapter.log
+bluphant-adapter.log
+.idea
