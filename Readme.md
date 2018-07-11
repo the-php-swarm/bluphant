@@ -40,7 +40,7 @@ It might be interesting to build other 2 classes to work with this:
 
 ### Using Composer
 
-```json
+```shell
 composer require bluzelle/bluzelle-php
 ```
 
