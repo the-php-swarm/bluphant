@@ -34,8 +34,8 @@ return [
     'connections' => [
 
         'bluphant' => [
-            'host' => '127.0.0.1',
-            'port' => '8100',
+            'host' => env('BLUZELLE_ADDRESS', '127.0.0.1'),
+            'port' => env('BLUZELLE_PORT' ,'8100'),
             'address_base' => '3f966cd1-ef79-4464-b3be-81e84002550b',
         ],
 
