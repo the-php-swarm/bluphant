@@ -166,7 +166,7 @@ return [
         // App\Providers\AopServiceProvider::class,
 
         // Laravel Swoole
-        SwooleTW\Http\LaravelServiceProvider::class,
+        // SwooleTW\Http\LaravelServiceProvider::class,
         // App\Providers\LaravelSwooleServiceProvider::class,
 
         // Laravels

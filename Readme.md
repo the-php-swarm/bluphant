@@ -3,9 +3,15 @@
 [![Build Status](https://travis-ci.org/the-php-swarm/bluphant.svg?branch=master)](https://travis-ci.org/the-php-swarm/bluphant)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+(This is the original, but I recommend to use this fork: https://github.com/bluzelle/bluzelle-php)
+
 Bluphant is a PHP library to interact with Bluzelle Blockchain Database.
 
 Bluzelle is a Blockchain Database that works in a system of swarms, this makes the availability, integrity, integrability and the consistency be natural. This is a PHP Database Adapter for Bluzelle.
+
+There is a sample here that is the existent ``example`` in this package built with ``docker-compose``: 
+
+> [Sample](https://swarm.masa.tech)
 
 ## Usage
 
@@ -34,8 +40,14 @@ It might be interesting to build other 2 classes to work with this:
 
 ### Using Composer
 
-```json
-composer require the-php-swarm/bliphant
+```shell
+composer require bluzelle/bluzelle-php
+```
+
+Because of the necessary support to **[protobuf](https://developers.google.com/protocol-buffers/)**, a required step to use this library is to install a PECL package through this command:
+
+```shell
+sudo pecl install protobuf-3.5.1
 ```
 
 ## Prepare Adapter
@@ -102,3 +114,15 @@ echo $adapter->execute();
 
 - [Bluzelle WebSocket API](https://bluzelle.github.io/api/#websocket-api)
 
+
+---
+
+## Protobuf
+
+There is a build step of this library for protobuf. This will be required so it accomplished the goal of Bluzelle project, which is to have a better environment for development and business.
+
+During the build step, that is not required for someone that is simply using this library, is to run this at the root directory of this library:
+
+```shell 
+protoc --proto_path=src/Datastructure --php_out=./src/Datastructure Database.proto
+```

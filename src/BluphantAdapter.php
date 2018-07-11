@@ -80,6 +80,11 @@ class BluphantAdapter implements DatabaseAdapterInterface
     const DELETE = 'delete';
 
     /**
+     * @var string
+     */
+    const REDIRECT = 'redirect';
+
+    /**
      * @param string $table
      * @param string $fetchStyle
      * @param string $cursorOrientation
@@ -135,44 +140,94 @@ class BluphantAdapter implements DatabaseAdapterInterface
      */
     public function execute($attempts = 0)
     {
-        $execution_params = [
-            "bzn-api" => "crud",
-            "cmd" => $this->config['method'],
-            "data" => $this->statement,
-            "db-uuid" => $this->config['db_uuid'],
-            "request-id" => $this->request_id
+        // --
+        $protobufDatabaseMsg = new \database_msg();
+
+        // prepare header
+        $protobufHeaderMsg = new \database_header();
+        $protobufHeaderMsg->setDbUuid($this->config['db_uuid']);
+        $protobufHeaderMsg->setTransactionId($this->request_id);
+        $protobufDatabaseMsg->setHeader($protobufHeaderMsg);
+
+        switch ($this->config['method']) {
+            case self::READ:
+                // prepare read message
+                $protobufReadMsg = new \database_read();
+                $protobufReadMsg->setKey($this->statement['key']);
+                $protobufDatabaseMsg->setRead($protobufReadMsg);
+                break;
+            case self::KEYS:
+                // prepare keys message
+                $protobufKeysMsg = new \database_empty();
+                $protobufDatabaseMsg->setKeys($protobufKeysMsg);
+                break;
+            case self::CREATE:
+                // prepare create message
+                $protobufCreateMsg = new \database_create();
+                $protobufCreateMsg->setKey($this->statement['key']);
+                $protobufCreateMsg->setValue($this->statement['value']);
+                $protobufDatabaseMsg->setCreate($protobufCreateMsg);
+                break;
+            case self::UPDATE:
+                // prepare update message
+                $protobufUpdateMsg = new \database_update();
+                $protobufUpdateMsg->setKey($this->statement['key']);
+                $protobufUpdateMsg->setValue($this->statement['value']);
+                $protobufDatabaseMsg->setUpdate($protobufUpdateMsg);
+                break;
+            case self::DELETE:
+                $protobufDeleteMsg = new \database_delete();
+                $protobufDeleteMsg->setKey($this->statement['key']);
+                $protobufDatabaseMsg->setDelete($protobufDeleteMsg);
+                break;
+        }
+
+        $bzn_msg = new \bzn_msg();
+        $bzn_msg->setDb($protobufDatabaseMsg);
+        $data = base64_encode($bzn_msg->serializeToString());
+
+        $executionParams = [
+            "bzn-api" => "database",
+            "msg" => $data
         ];
 
-        $this->log_info->info('Request statement: ', $execution_params);
+        // --
 
-        $this->client->send(json_encode($execution_params));
+        $this->log_info->info('Request statement (execution params): ', [$executionParams]);
+        $this->log_info->info('Request statement (data): ', [$data]);
+
+        $this->client->send(json_encode($executionParams));
 
         $result = $this->client->receive();
 
-        $this->log_info->info('Request result: ', [$result]);
+        $protobufResponse = new \database_response();
+        $protobufResponse->mergeFromString($result);
+        $success = $protobufResponse->getSuccess();
 
-        if($attempts > 0){
-            throw new \Exception('Multiple attempts happening. This is being investigated.');
+        if ($success === self::REDIRECT && $attempts > 2) {
+            throw new \Exception('Too many redirections.');
         }
 
-        if ($this->isLeaderResponse($result) && $attempts < 2) {
+        if ($success === self::REDIRECT) {
+            $this->treatLeaderResponse($protobufResponse->getRedirect());
             $attempts++;
             return $this->execute($attempts);
         }
 
-        $result = json_decode($result, true);
-
-        if (!isset($result['data']) || $result['data'] === null) {
-            $result['data'] = [];
-        }
+        $this->log_info->info('Request result (success): ', [$success]);
 
         // place the statement in the result preffering the result's data
         switch ($this->config['method']) {
             case self::READ:
-                $result = array_merge($this->statement, $result['data']);
+                // TODO: treat error
+                $result = json_decode($protobufResponse->getResp()->getValue());
+                $result->key = $this->statement['key'];
                 break;
             case self::KEYS:
-                $result = $result['data'];
+                $result = [];
+                foreach ($protobufResponse->getResp()->getKeys() as $key) {
+                    $result[] = $key;
+                }
                 break;
         }
 
@@ -261,18 +316,12 @@ class BluphantAdapter implements DatabaseAdapterInterface
      *
      * @return bool
      */
-    private function isLeaderResponse(string $result)
+    private function treatLeaderResponse(\database_redirect_response $redirect)
     {
-        $result = json_decode($result, true);
-
-        if (isset($result['data']['leader-host'])) {
-            $this->client = new Client(
-                "ws://" . $result['data']['leader-host'] . ":" . $result['data']['leader-port']
-            );
-            return true;
-        }
-
-        return false;
+        $this->client = new Client(
+            "ws://" . $redirect->getLeaderHost() . ":" . $redirect->getLeaderPort()
+        );
+        return true;
     }
 
 }

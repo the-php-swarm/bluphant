@@ -48,18 +48,17 @@ class NoteController extends Controller
         $notes = $this->adapter->keys($this->table)->execute();
 
         $notes_array = [];
-        if (isset($notes['keys'])) {
-            foreach ($notes['keys'] as $key => $value) {
+        if (count($notes) > 0) {
+            foreach ($notes as $key => $value) {
                 $notes_array[$key] = $this->adapter->select($this->table, ['key' => $value])->execute();
             }
         }
 
         $notes_array = array_map(function($item){
-            $data = json_decode($item['value'], true);
             return [
-                'key' => $item['key'],
-                'title' => $data['title'],
-                'content' => $data['content']
+                'key' => $item->key,
+                'title' => $item->title,
+                'content' => $item->content
             ];
         }, $notes_array);
 
@@ -127,12 +126,10 @@ class NoteController extends Controller
     {
         $note = $this->adapter->select($this->table, ['key' => $key])->execute();
 
-        $note_value = json_decode($note['value'], true);
-
         $note = [
-            'key' => $note['key'],
-            'title' => $note_value['title'],
-            'content' => $note_value['content']
+            'key' => $note->key,
+            'title' => $note->title,
+            'content' => $note->content
         ];
 
         return view('notes/notes-view', [
@@ -150,12 +147,10 @@ class NoteController extends Controller
     {
         $note = $this->adapter->select($this->table, ['key' => $key])->execute();
 
-        $note_value = json_decode($note['value'], true);
-
         $note = [
-            'key' => $note['key'],
-            'title' => $note_value['title'],
-            'content' => $note_value['content']
+            'key' => $note->key,
+            'title' => $note->title,
+            'content' => $note->content
         ];
 
         return view('notes/notes-edit', [
