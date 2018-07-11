@@ -9,6 +9,10 @@ Bluphant is a PHP library to interact with Bluzelle Blockchain Database.
 
 Bluzelle is a Blockchain Database that works in a system of swarms, this makes the availability, integrity, integrability and the consistency be natural. This is a PHP Database Adapter for Bluzelle.
 
+There is a sample here that is the existent ``example`` in this package built with ``docker-compose``: 
+
+> [Sample](https://swarm.masa.tech)
+
 ## Usage
 
 Before everything, Bluphant is an Adapter, and to use it you just have to place it as an $adapter for you Database Layer.
@@ -37,7 +41,7 @@ It might be interesting to build other 2 classes to work with this:
 ### Using Composer
 
 ```json
-composer require the-php-swarm/bliphant
+composer require bluzelle/bluzelle-php
 ```
 
 Because of the necessary support to **[protobuf](https://developers.google.com/protocol-buffers/)**, a required step to use this library is to install a PECL package through this command:
