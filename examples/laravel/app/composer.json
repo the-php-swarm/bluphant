@@ -6,12 +6,12 @@
     "type": "project",
     "require": {
         "php": "^7.1.3",
+        "bluzelle/bluzelle-php": "dev-master",
         "fideloper/proxy": "^4.0",
         "google/protobuf": "v3.6.0.1",
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0",
-        "laravelcollective/html": "^5.4.0",
-        "bluzelle/bluzelle-php": "^1.*
+        "laravelcollective/html": "^5.4.0"
     },
     "require-dev": {
         "filp/whoops": "^2.0",
